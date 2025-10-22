@@ -1,11 +1,11 @@
+---
 name: Infra Validation (OpenTofu + Go Tests)
 
 on:
-  pull_request:
   push:
     branches:
-      - main
-      - develop
+      - '**'
+  pull_request:
 
 jobs:
   infra-validation:
@@ -34,7 +34,9 @@ jobs:
 
       - name: Install TFLint
         run: |
-          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+          curl -s \
+          https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh \
+          | bash
 
       - name: Terraform Validation
         run: |
