@@ -3,7 +3,7 @@ resource "aws_vpc" "this" {
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = merge(var.tags, {
-    Name = "${var.name}-vpc"
+    Name = "${var.name}-vpc1"
   })
 }
 
