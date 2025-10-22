@@ -7,44 +7,41 @@ import (
 )
 
 func TestSubnetModule(t *testing.T) {
-    t.Parallel()
-
-    // First, create a VPC (dependency)
+    // Create a VPC first (required for subnet)
     vpcOptions := &terraform.Options{
         TerraformDir: "../modules/vpc",
         Vars: map[string]interface{}{
-            "name":     "test-vpc",
-            "vpc_cidr": "10.0.0.0/16",
-            "tags": map[string]string{
-                "Environment": "dev",
-                "Project":     "opentofu-demo",
-            },
+            "name":     "test-vpc-for-subnet",
+            "vpc_cidr": "10.1.0.0/16",
         },
     }
 
-    defer terraform.Destroy(t, vpcOptions)
+    defer func() {
+        terraform.DestroyE(t, vpcOptions)
+    }()
     terraform.InitAndApply(t, vpcOptions)
-    vpcID := terraform.Output(t, vpcOptions, "vpc_id")
 
-    // Now test the Subnet
-    terraformOptions := &terraform.Options{
+    vpcID := terraform.Output(t, vpcOptions, "vpc_id")
+    assert.NotEmpty(t, vpcID)
+
+    // Now create a subnet
+    subnetOptions := &terraform.Options{
         TerraformDir: "../modules/subnet",
         Vars: map[string]interface{}{
             "name":               "test-subnet",
             "vpc_id":             vpcID,
-            "public_subnet_cidr": "10.0.1.0/24",
+            "public_subnet_cidr": "10.1.1.0/24",
             "az":                 "ap-south-1a",
-            "tags": map[string]string{
-                "Environment": "dev",
-                "Project":     "opentofu-demo",
-            },
         },
     }
 
-    defer terraform.Destroy(t, terraformOptions)
-    terraform.InitAndApply(t, terraformOptions)
+    defer func() {
+        terraform.DestroyE(t, subnetOptions)
+    }()
 
-    subnetID := terraform.Output(t, terraformOptions, "subnet_id")
-    assert.NotEmpty(t, subnetID)
+    terraform.InitAndApply(t, subnetOptions)
+
+    subnetID := terraform.Output(t, subnetOptions, "subnet_id")
+    assert.NotEmpty(t, subnetID, "Subnet ID should not be empty")
 }
 

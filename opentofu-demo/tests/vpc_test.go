@@ -7,8 +7,6 @@ import (
 )
 
 func TestVPCModule(t *testing.T) {
-    t.Parallel()
-
     terraformOptions := &terraform.Options{
         TerraformDir: "../modules/vpc",
         Vars: map[string]interface{}{
@@ -16,15 +14,19 @@ func TestVPCModule(t *testing.T) {
             "vpc_cidr": "10.0.0.0/16",
             "tags": map[string]string{
                 "Environment": "dev",
-                "Project":     "opentofu-demo",
+                "Module":      "vpc",
             },
         },
     }
 
-    defer terraform.Destroy(t, terraformOptions)
+    // Always attempt cleanup — even on failure
+    defer func() {
+        terraform.DestroyE(t, terraformOptions)
+    }()
+
     terraform.InitAndApply(t, terraformOptions)
 
     vpcID := terraform.Output(t, terraformOptions, "vpc_id")
-    assert.NotEmpty(t, vpcID)
+    assert.NotEmpty(t, vpcID, "VPC ID should not be empty")
 }
 
