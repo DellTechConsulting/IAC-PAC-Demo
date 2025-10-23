@@ -37,6 +37,13 @@ jobs:
           curl -s \
           https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh \
           | bash
+      
+      - name: Ensure Go dependencies
+        run: |
+          cd opentofu-demo/
+          go mod tidy
+          go mod download   
+
 
       - name: Terraform Validation
         run: |
