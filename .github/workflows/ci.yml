@@ -43,6 +43,12 @@ jobs:
           tofu fmt -check
           tofu validate
           tflint || echo "TFLint warnings ignored for now"
+     
+      - name: Reinitialize tofu before tests
+        run: |
+          cd opentofu-demo
+          find . -type f -name ".terraform.lock.hcl" -delete
+          tofu init -upgrade
 
       - name: Run Go Infra Tests
         run: |
