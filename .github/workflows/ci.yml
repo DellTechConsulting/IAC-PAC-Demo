@@ -46,13 +46,18 @@ jobs:
 
       - name: Run Go Infra Tests
         run: |
-          cd tests
+          cd opentofu-demo/tests
           go test -v -timeout 30m ./...
         continue-on-error: false
 
       - name: Force Cleanup (Always Run)
         if: always()
         run: |
-          cd tests
+          cd opentofu-demo/tests
           go test -v -timeout 30m -run TestCleanupAll
+
+
+
+
+
 
